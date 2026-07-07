@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carta de Reserva · Loma Verde</title>
+
+    <style>
+      :root{
+        --brand:#2196F3; --brand-dark:#1565C0; --brand-soft:#e3f2fd;
+        --ink:#1f2a24; --muted:#6b7c72; --line:#d7e3da; --bg:#f4f8f5; --card:#ffffff;
+        --danger:#c62828; --radius:14px;
+      }
+      *{box-sizing:border-box}
+      body{
+        margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+        background:var(--bg); color:var(--ink); line-height:1.45; -webkit-text-size-adjust:100%;
+      }
+      .wrap{max-width:640px; margin:0 auto; padding:16px 14px 48px}
+      header.brand{
+        text-align:center; padding:22px 16px; margin-bottom:14px;
+        background:linear-gradient(135deg,var(--brand),var(--brand-dark)); color:#fff; border-radius:var(--radius);
+        box-shadow:0 6px 18px rgba(21,101,192,.18);
+      }
+      header.brand .logo{font-size:34px; line-height:1}
+      header.brand h1{margin:6px 0 2px; font-size:20px; letter-spacing:.3px}
+      header.brand p{margin:0; opacity:.9; font-size:13px}
+      .card{
+        background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+        padding:16px 14px; margin-bottom:14px;
+      }
+      .card h2{
+        margin:0 0 12px; font-size:15px; color:var(--brand-dark);
+        display:flex; align-items:center; gap:8px;
+      }
+      label{display:block; font-size:13px; font-weight:600; color:var(--muted); margin:10px 0 4px}
+      input,select,textarea{
+        width:100%; padding:11px 12px; font-size:16px; color:var(--ink);
+        border:1px solid var(--line); border-radius:10px; background:#fff; font-family:inherit;
+      }
+      input:focus,select:focus,textarea:focus{outline:none; border-color:var(--brand); box-shadow:0 0 0 3px var(--brand-soft)}
+      textarea{resize:vertical; min-height:64px}
+      .row{display:flex; gap:10px}
+      .row > *{flex:1}
+      .ci{display:flex; gap:8px}
+      .ci select{max-width:88px; flex:0 0 auto}
+      .seg{display:flex; gap:8px; margin-top:4px}
+      .seg button{
+        flex:1; padding:10px; border:1px solid var(--line); background:#fff; border-radius:10px;
+        font-size:15px; font-weight:600; color:var(--muted); cursor:pointer;
+      }
+      .seg button.on{background:var(--brand); color:#fff; border-color:var(--brand)}
+      .hint{font-size:12px; color:var(--muted); margin-top:4px}
+      .companion{border:1px dashed var(--line); border-radius:12px; padding:12px; margin-bottom:10px; position:relative; background:#fbfdfb}
+      .companion .ctitle{font-size:13px; font-weight:700; color:var(--brand-dark); margin-bottom:2px}
+      .companion .del{
+        position:absolute; top:8px; right:8px; border:none; background:transparent; color:var(--danger);
+        font-size:20px; cursor:pointer; line-height:1; padding:4px;
+      }
+      .addbtn{
+        width:100%; padding:12px; border:1px dashed var(--brand); background:var(--brand-soft);
+        color:var(--brand-dark); border-radius:12px; font-size:15px; font-weight:700; cursor:pointer;
+      }
+      .actions{position:sticky; bottom:0; padding:12px 0 4px; background:linear-gradient(180deg,transparent,var(--bg) 30%)}
+      .btn{
+        width:100%; padding:15px; border:none; border-radius:12px; font-size:17px; font-weight:700;
+        cursor:pointer; margin-top:10px;
+      }
+      .btn.wa{background:#25D366; color:#0b2e17; box-shadow:0 6px 16px rgba(37,211,102,.35)}
+      .btn.copy{background:#fff; color:var(--brand-dark); border:1px solid var(--brand)}
+      .ok{
+        display:none; text-align:center; color:var(--brand-dark); font-weight:700; font-size:13px;
+        margin-top:10px; background:var(--brand-soft); padding:8px; border-radius:10px;
+      }
+      details.preview{margin-top:12px}
+      details.preview summary{cursor:pointer; font-size:13px; color:var(--muted); font-weight:600}
+      details.preview pre{
+        white-space:pre-wrap; word-break:break-word; background:#0f1a13; color:#d7ecd9;
+        padding:12px; border-radius:10px; font-size:12px; margin-top:8px; overflow-x:auto;
+      }
+      footer{text-align:center; font-size:11px; color:var(--muted); margin-top:18px}
+    </style>
+</head>
+
+<body>
+
+    <div class="wrap">
+
+      <header class="brand">
+        <div class="logo">🌄</div>
+        <h1>Posada Loma Verde</h1>
+        <p>Carta de reserva — rellena tus datos y envíanoslos por WhatsApp</p>
+      </header>
+
+      <form id="form" autocomplete="on">
+
+        <!-- GUEST -->
+        <section class="card">
+          <h2>👤 Datos del huésped principal</h2>
+
+          <label for="nombre">Nombre completo</label>
+          <input id="nombre" type="text" maxLength="150" placeholder="Juan Pérez">
+
+          <label>Cédula</label>
+          <div class="ci">
+            <select id="ciTipo">
+              <option value="V">V</option>
+              <option value="E">E</option>
+              <option value="J">J</option>
+              <option value="P">P</option>
+              <option value="G">G</option>
+            </select>
+            <input id="ciNum" type="text" class="num" inputmode="numeric" maxlength="10" placeholder="14577846">
+          </div>
+
+          <div class="row">
+            <div>
+              <label for="edad">Edad</label>
+              <input id="edad" type="text" class="num" inputmode="numeric" maxlength="3" placeholder="31">
+            </div>
+            <div>
+              <label for="ciudad">Ciudad desde donde visita</label>
+              <input id="ciudad" type="text" maxLength="150" placeholder="Mérida">
+            </div>
+          </div>
+
+          <label for="tlf">Teléfono</label>
+          <input id="tlf" type="tel" inputmode="tel" class="telf" maxLength="15" value="+58 " placeholder="+58 04124275365">
+
+          <label for="tlf2">Teléfono 2 <span class="hint">(opcional)</span></label>
+          <input id="tlf2" type="tel" inputmode="tel" class="telf" maxLength="15" placeholder="+58 ...">
+        </section>
+
+        <!-- DATES -->
+        <section class="card">
+          <h2>📅 Fechas de estadía</h2>
+          <div class="row">
+            <div>
+              <label for="checkin">Check-In (entrada)</label>
+              <input id="checkin" type="date">
+            </div>
+            <div>
+              <label for="checkout">Check-Out (salida)</label>
+              <input id="checkout" type="date">
+            </div>
+          </div>
+          <p class="hint">Entrada a las 2:00 pm · Salida a las 12:00 pm</p>
+        </section>
+
+        <!-- PETS -->
+        <section class="card">
+          <h2>🐾 Mascota</h2>
+          <label>¿Viaja con mascota?</label>
+          <div class="seg" id="petSeg">
+            <button type="button" data-pet="NO" class="on">No</button>
+            <button type="button" data-pet="SI">Sí</button>
+          </div>
+          <div id="petBox" style="display:none">
+            <label for="petDesc">Descripción de mascota</label>
+            <input id="petDesc" type="text" maxLength="150" placeholder="Dos perros pequeños">
+          </div>
+        </section>
+
+        <!-- VEHICLES -->
+        <section class="card">
+          <h2>🚗 Vehículos</h2>
+          <div class="row">
+            <div><label for="motos">Motos</label><input id="motos" type="text" class="num" inputmode="numeric" maxlength="2" value="0"></div>
+            <div><label for="carros">Carros</label><input id="carros" type="text" class="num" inputmode="numeric" maxlength="2" value="0"></div>
+          </div>
+          <div class="row">
+            <div><label for="camiones">Camiones</label><input id="camiones" type="text" class="num" inputmode="numeric" maxlength="2" value="0"></div>
+            <div><label for="autobuses">Autobuses</label><input id="autobuses" type="text" class="num" inputmode="numeric" maxlength="2" value="0"></div>
+          </div>
+          <label for="placa">Placa (una)</label>
+          <input id="placa" type="text" maxLength="10" placeholder="AB123CD">
+          <label for="vehDesc">Descripción de vehículo</label>
+          <input id="vehDesc" type="text" maxLength="150" placeholder="Corolla rojo 2010">
+        </section>
+
+        <!-- COMPANIONS -->
+        <section class="card">
+          <h2>👥 Acompañantes</h2>
+          <div id="companions"></div>
+          <button type="button" class="addbtn" id="addComp">+ Agregar acompañante</button>
+          <p class="hint">Deja esta sección vacía si viajas solo.</p>
+        </section>
+
+        <div class="actions">
+          <button type="button" class="btn wa" id="send">📲 Enviar por WhatsApp</button>
+          <button type="button" class="btn copy" id="copy">📋 Copiar texto</button>
+          <div class="ok" id="ok">✅ ¡Listo! Texto copiado.</div>
+          <details class="preview">
+            <summary>Ver el texto que se enviará</summary>
+            <pre id="prev"></pre>
+          </details>
+        </div>
+      </form>
+
+      <footer>Posada Loma Verde · Tus datos solo se envían cuando presionas el botón de WhatsApp.</footer>
+    </div>
+
+    <script>
+        const HOTEL_WHATSAPP = "584120733872";
+
+        const $ = id => document.getElementById(id);
+
+        /* ---- Pets: segment Sí/No ---- */
+        let hasPet = false;
+        $("petSeg").addEventListener("click", e =>
+        {
+            const b = e.target.closest("button[data-pet]");
+            if (!b) return;
+            hasPet = b.dataset.pet === "SI";
+            [...$("petSeg").children].forEach(x => x.classList.toggle("on", x === b));
+            $("petBox").style.display = hasPet ? "block" : "none";
+        });
+
+        /* ---- Dinamic Companions ---- */
+        let compCount = 0;
+        function addCompanion()
+        {
+            compCount++;
+            const div = document.createElement("div");
+            div.className = "companion";
+            div.innerHTML = `
+            <button type="button" class="del" title="Quitar">✕</button>
+            <div class="ctitle">Acompañante ${compCount}</div>
+            <label>Nombre completo</label>
+            <input type="text" class="c-name" maxlength="150" placeholder="Luis Pérez">
+            <label>Cédula <span class="hint">(opcional)</span></label>
+            <div class="ci">
+                <select class="c-tipo">
+                <option value="V">V</option><option value="E">E</option>
+                <option value="J">J</option><option value="P">P</option><option value="G">G</option>
+                </select>
+                <input type="text" class="c-num num" inputmode="numeric" maxlength="10" placeholder="30623443">
+            </div>
+            <label>Tipo</label>
+            <div class="seg c-age">
+                <button type="button" data-age="Adulto" class="on">Adulto</button>
+                <button type="button" data-age="Niño">Niño</button>
+            </div>`;
+            div.querySelector(".del").addEventListener("click", () => 
+            {
+                div.remove(); // we delete this div
+                renumber();   // we recalculate the numbers of the remaining companions
+            });
+            div.querySelector(".c-age").addEventListener("click", e =>
+            {
+                const b = e.target.closest("button[data-age]");
+                if (!b) return;
+                [...b.parentElement.children].forEach(x => x.classList.toggle("on", x === b));
+            });
+            $("companions").appendChild(div);
+        }
+
+        function renumber() // goes trought all companions -> ctitle and rename them with the 
+        {                   // corresponding number, also updates compCount
+            [...document.querySelectorAll(".companion .ctitle")].forEach((t,i) => t.textContent = "Acompañante " + (i+1));
+            compCount = document.querySelectorAll(".companion").length;
+        }
+        $("addComp").addEventListener("click", addCompanion);
+
+        /* ---- Date yyyy-mm-dd -> dd/MM/yy used in buildText()---- */
+        function fmtDate(v)
+        {
+            if(!v) return "";
+            const [y,m,d] = v.split("-");
+            return `${d}/${m}/${y.slice(2)}`;
+        }
+
+        /* ---- Constructs the text in the format that the app waits ---- */
+        function buildText()
+        {
+            const L = [];
+            L.push("Nombre completo: " + $("nombre").value.trim());
+            const num = $("ciNum").value.trim();
+            L.push("Cédula: " + (num ? $("ciTipo").value + num : ""));
+            L.push("Edad: " + $("edad").value.trim());
+            L.push("Telefono: " + $("tlf").value.trim());
+            L.push("Telefono 2: " + $("tlf2").value.trim());
+            L.push("Ciudad desde donde visita: " + $("ciudad").value.trim());
+            L.push("Check-In: " + fmtDate($("checkin").value));
+            L.push("Check-Out: " + fmtDate($("checkout").value));
+            L.push("Tiene mascota: " + (hasPet ? "SI" : "NO"));
+            L.push("Descripción de mascota: " + (hasPet ? $("petDesc").value.trim() : ""));
+            L.push("Motos: " + ($("motos").value.trim() || "0"));
+            L.push("Autobuses: " + ($("autobuses").value.trim() || "0"));
+            L.push("Carros: " + ($("carros").value.trim() || "0"));
+            L.push("Camiones: " + ($("camiones").value.trim() || "0"));
+            L.push("Placa(una): " + $("placa").value.trim());
+            L.push("Descripción de vehículo: " + $("vehDesc").value.trim());
+
+            // Selects all companions divs that have a name filled in
+            const comps = [...document.querySelectorAll(".companion")] 
+                .filter(c => c.querySelector(".c-name").value.trim()); 
+            if (comps.length)
+            {
+                L.push("");
+                L.push("Acompañantes:");
+                comps.forEach(c =>
+                {
+                    const cnum = c.querySelector(".c-num").value.trim();
+                    const age = c.querySelector(".c-age .on").dataset.age;
+                    L.push(c.querySelector(".c-name").value.trim());
+                    L.push(cnum ? c.querySelector(".c-tipo").value + cnum : "");
+                    L.push(age);
+                });
+            }
+            return L.join("\n");
+        }
+
+        /* ---- Numeric-only inputs: strip anything that isn't a digit as you type.
+           Uses delegation on the form (class "num"), so it also covers the c-num
+           inputs of companions added later by addCompanion(). Runs BEFORE the
+           "Alive Preview" listener below (registration order), so the preview
+           always reads the already-cleaned value. ---- */
+        $("form").addEventListener("input", e =>
+        {
+            if (e.target.matches(".num"))
+                e.target.value = e.target.value.replace(/\D/g, "");
+            if (e.target.matches(".telf"))
+            {
+                let hasPlus = e.target.value[0] === '+';
+                if (hasPlus) e.target.value = '+' + e.target.value.replace(/\D/g, "");
+                else e.target.value = e.target.value.replace(/\D/g, "");
+            }
+        });
+
+        /* ---- Alive Preview ---- */
+        function refresh() { $("prev").textContent = buildText(); }
+        $("form").addEventListener("input", refresh);
+        $("form").addEventListener("click", () => setTimeout(refresh, 0));
+        refresh();
+
+        /* ---- Send via WhatsApp ---- */
+        $("send").addEventListener("click", () =>
+        {
+            if (!$("nombre").value.trim())
+            {
+                alert("Por favor escribe al menos el nombre completo.");
+                return;
+            }
+            const text = encodeURIComponent(buildText());
+            window.open(`https://wa.me/${HOTEL_WHATSAPP}?text=${text}`, "_blank");
+        });
+
+        /* ---- Copy text (backup) ---- */
+        $("copy").addEventListener("click", async () =>
+        {
+            const text = buildText();
+            try { await navigator.clipboard.writeText(text); }
+            catch // works almost on every browser
+            {
+                const t = document.createElement("textarea");
+                t.value = text;               // Creates a text area 
+                document.body.appendChild(t); // Add it to the doc
+                t.select();                   // Select the content Ctrl + A 
+                document.execCommand("copy"); // Copy it Ctrl + C
+                t.remove();                   // Delete the text area
+            }
+            const ok = $("ok"); // The text = "Everything copied"
+            ok.style.display = "block"; // We show it and hide it after 2.2 sec
+            setTimeout(() => ok.style.display = "none", 2200);
+        });
+        </script>
+    </body>
+</html>
