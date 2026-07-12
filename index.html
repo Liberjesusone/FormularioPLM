@@ -231,10 +231,6 @@
             <input type="text" class="c-name" maxlength="150" placeholder="Luis Pérez">
             <label>Cédula <span class="hint">(opcional)</span></label>
             <div class="ci">
-                <select class="c-tipo">
-                <option value="V">V</option><option value="E">E</option>
-                <option value="J">J</option><option value="P">P</option><option value="G">G</option>
-                </select>
                 <input type="text" class="c-num num" inputmode="numeric" maxlength="10" placeholder="30623443">
             </div>
             <label>Tipo</label>
@@ -305,7 +301,7 @@
                     const cnum = c.querySelector(".c-num").value.trim();
                     const age = c.querySelector(".c-age .on").dataset.age;
                     L.push(c.querySelector(".c-name").value.trim());
-                    L.push(cnum ? c.querySelector(".c-tipo").value + cnum : "");
+                    L.push(cnum ? cnum : "0");
                     L.push(age);
                 });
             }
