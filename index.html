@@ -1,10 +1,15 @@
 <!DOCTYPE html>
+<!--
+    Guest booking form ("Carta de reserva"). GENERATED from docs/template/form.template.html by
+    docs/template/build_forms.py — edit the template and run the script, not the generated files.
+    Hotel: Posada Loma Verde
+-->
 <html lang="es">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Carta de Reserva · Loma Verde</title>
+    <title>Carta de Reserva · Posada Loma Verde</title>
 
     <style>
       :root{
@@ -21,7 +26,7 @@
       header.brand{
         text-align:center; padding:22px 16px; margin-bottom:14px;
         background:linear-gradient(135deg,var(--brand),var(--brand-dark)); color:#fff; border-radius:var(--radius);
-        box-shadow:0 6px 18px rgba(21,101,192,.18);
+        box-shadow:0 6px 18px rgba(0,0,0,.15);
       }
       header.brand .logo{font-size:34px; line-height:1}
       header.brand h1{margin:6px 0 2px; font-size:20px; letter-spacing:.3px}
@@ -40,7 +45,6 @@
         border:1px solid var(--line); border-radius:10px; background:#fff; font-family:inherit;
       }
       input:focus,select:focus,textarea:focus{outline:none; border-color:var(--brand); box-shadow:0 0 0 3px var(--brand-soft)}
-      textarea{resize:vertical; min-height:64px}
       .row{display:flex; gap:10px}
       .row > *{flex:1}
       .ci{display:flex; gap:8px}
@@ -54,13 +58,15 @@
       .hint{font-size:12px; color:var(--muted); margin-top:4px}
       .companion{border:1px dashed var(--line); border-radius:12px; padding:12px; margin-bottom:10px; position:relative; background:#fbfdfb}
       .companion .ctitle{font-size:13px; font-weight:700; color:var(--brand-dark); margin-bottom:2px}
-      .companion .del{
+      .del{
         position:absolute; top:8px; right:8px; border:none; background:transparent; color:var(--danger);
         font-size:20px; cursor:pointer; line-height:1; padding:4px;
       }
+      .group{border:2px solid var(--brand-soft); border-radius:14px; padding:12px; margin-bottom:12px; position:relative}
+      .group .gtitle{font-size:14px; font-weight:800; color:var(--brand-dark); margin-bottom:4px}
       .addbtn{
         width:100%; padding:12px; border:1px dashed var(--brand); background:var(--brand-soft);
-        color:var(--brand-dark); border-radius:12px; font-size:15px; font-weight:700; cursor:pointer;
+        color:var(--brand-dark); border-radius:12px; font-size:15px; font-weight:700; cursor:pointer; margin-top:4px;
       }
       .actions{position:sticky; bottom:0; padding:12px 0 4px; background:linear-gradient(180deg,transparent,var(--bg) 30%)}
       .btn{
@@ -105,11 +111,8 @@
           <label>Cédula</label>
           <div class="ci">
             <select id="ciTipo">
-              <option value="V">V</option>
-              <option value="E">E</option>
-              <option value="J">J</option>
-              <option value="P">P</option>
-              <option value="G">G</option>
+              <option value="V">V</option><option value="E">E</option><option value="J">J</option>
+              <option value="P">P</option><option value="G">G</option>
             </select>
             <input id="ciNum" type="text" class="num" inputmode="numeric" maxlength="10" placeholder="14577846">
           </div>
@@ -179,12 +182,20 @@
           <input id="vehDesc" type="text" maxLength="150" placeholder="Corolla rojo 2010">
         </section>
 
-        <!-- COMPANIONS -->
+        <!-- GENERAL COMPANIONS -->
         <section class="card">
           <h2>👥 Acompañantes</h2>
-          <div id="companions"></div>
-          <button type="button" class="addbtn" id="addComp">+ Agregar acompañante</button>
-          <p class="hint">Deja esta sección vacía si viajas solo.</p>
+          <div id="companions" class="comp-list"></div>
+          <button type="button" class="addbtn" data-add-comp="companions">+ Agregar acompañante</button>
+          <p class="hint">Deja esta sección vacía si viajas solo. Si vienen en grupo y ocupan varias habitaciones, usa la sección de abajo.</p>
+        </section>
+
+        <!-- GROUPS: people per room -->
+        <section class="card">
+          <h2>🏠 Grupos por habitación <span class="hint">(opcional)</span></h2>
+          <div id="groups"></div>
+          <button type="button" class="addbtn" id="addGroup">+ Agregar habitación</button>
+          <p class="hint">Indica qué personas se quedan en cada habitación. La recepción confirmará la asignación final.</p>
         </section>
 
         <div class="actions">
@@ -202,7 +213,11 @@
     </div>
 
     <script>
-        const HOTEL_WHATSAPP = "584120733872";
+        // ── Hotel configuration (filled by build_forms.py) ──
+        const CONFIG = {
+            whatsapp: "584120733872",
+            rooms: ["C.1", "C.2", "C.3", "C.4", "H.5", "H.6", "H.7", "H.8", "H.9", "H.10"]
+        };
 
         const $ = id => document.getElementById(id);
 
@@ -217,20 +232,22 @@
             $("petBox").style.display = hasPet ? "block" : "none";
         });
 
-        /* ---- Dinamic Companions ---- */
-        let compCount = 0;
-        function addCompanion()
+        /* ---- Companions: one function for the general list and for every room group ---- */
+        function addCompanion(list)
         {
-            compCount++;
             const div = document.createElement("div");
             div.className = "companion";
             div.innerHTML = `
             <button type="button" class="del" title="Quitar">✕</button>
-            <div class="ctitle">Acompañante ${compCount}</div>
+            <div class="ctitle"></div>
             <label>Nombre completo</label>
             <input type="text" class="c-name" maxlength="150" placeholder="Luis Pérez">
             <label>Cédula <span class="hint">(opcional)</span></label>
             <div class="ci">
+                <select class="c-tipo">
+                <option value="V">V</option><option value="E">E</option>
+                <option value="J">J</option><option value="P">P</option><option value="G">G</option>
+                </select>
                 <input type="text" class="c-num num" inputmode="numeric" maxlength="10" placeholder="30623443">
             </div>
             <label>Tipo</label>
@@ -238,34 +255,67 @@
                 <button type="button" data-age="Adulto" class="on">Adulto</button>
                 <button type="button" data-age="Niño">Niño</button>
             </div>`;
-            div.querySelector(".del").addEventListener("click", () => 
-            {
-                div.remove(); // we delete this div
-                renumber();   // we recalculate the numbers of the remaining companions
-            });
+            div.querySelector(".del").addEventListener("click", () => { div.remove(); renumber(list); });
             div.querySelector(".c-age").addEventListener("click", e =>
             {
                 const b = e.target.closest("button[data-age]");
                 if (!b) return;
                 [...b.parentElement.children].forEach(x => x.classList.toggle("on", x === b));
             });
-            $("companions").appendChild(div);
+            list.appendChild(div);
+            renumber(list);
         }
 
-        function renumber() // goes trought all companions -> ctitle and rename them with the 
-        {                   // corresponding number, also updates compCount
-            [...document.querySelectorAll(".companion .ctitle")].forEach((t,i) => t.textContent = "Acompañante " + (i+1));
-            compCount = document.querySelectorAll(".companion").length;
+        function renumber(list)
+        {
+            [...list.querySelectorAll(":scope > .companion .ctitle")].forEach((t, i) => t.textContent = "Persona " + (i + 1));
         }
-        $("addComp").addEventListener("click", addCompanion);
+
+        // Any "+ Agregar acompañante" button (general or of a group) adds to its own list
+        document.addEventListener("click", e =>
+        {
+            const b = e.target.closest("button[data-add-comp]");
+            if (!b) return;
+            const list = b.dataset.addComp === "companions" ? $("companions") : b.parentElement.querySelector(".comp-list");
+            addCompanion(list);
+        });
+
+        /* ---- Room groups ---- */
+        function addGroup()
+        {
+            const div = document.createElement("div");
+            div.className = "group";
+            const options = CONFIG.rooms.map(r => `<option value="${r}">${r}</option>`).join("");
+            div.innerHTML = `
+            <button type="button" class="del" title="Quitar habitación">✕</button>
+            <div class="gtitle">Habitación</div>
+            <select class="g-room">${options}</select>
+            <div class="comp-list" style="margin-top:10px"></div>
+            <button type="button" class="addbtn" data-add-comp="group">+ Agregar persona a esta habitación</button>`;
+            div.querySelector(".del").addEventListener("click", () => div.remove());
+            $("groups").appendChild(div);
+            addCompanion(div.querySelector(".comp-list"));
+        }
+        $("addGroup").addEventListener("click", addGroup);
 
         /* ---- Date yyyy-mm-dd -> dd/MM/yy used in buildText()---- */
         function fmtDate(v)
         {
-            if(!v) return "";
-            const [y,m,d] = v.split("-");
+            if (!v) return "";
+            const [y, m, d] = v.split("-");
             return `${d}/${m}/${y.slice(2)}`;
         }
+
+        // Name / CI / Adulto|Niño: the 3 lines per person the app reads
+        function personLines(c, L)
+        {
+            const cnum = c.querySelector(".c-num").value.trim();
+            L.push(c.querySelector(".c-name").value.trim());
+            L.push(cnum ? c.querySelector(".c-tipo").value + cnum : "");
+            L.push(c.querySelector(".c-age .on").dataset.age);
+        }
+
+        const filled = list => [...list.querySelectorAll(":scope > .companion")].filter(c => c.querySelector(".c-name").value.trim());
 
         /* ---- Constructs the text in the format that the app waits ---- */
         function buildText()
@@ -289,30 +339,28 @@
             L.push("Placa(una): " + $("placa").value.trim());
             L.push("Descripción de vehículo: " + $("vehDesc").value.trim());
 
-            // Selects all companions divs that have a name filled in
-            const comps = [...document.querySelectorAll(".companion")] 
-                .filter(c => c.querySelector(".c-name").value.trim()); 
-            if (comps.length)
+            const general = filled($("companions"));
+            if (general.length)
             {
                 L.push("");
                 L.push("Acompañantes:");
-                comps.forEach(c =>
-                {
-                    const cnum = c.querySelector(".c-num").value.trim();
-                    const age = c.querySelector(".c-age .on").dataset.age;
-                    L.push(c.querySelector(".c-name").value.trim());
-                    L.push(cnum ? cnum : "0");
-                    L.push(age);
-                });
+                general.forEach(c => personLines(c, L));
             }
+
+            // One block per room: "Habitación: H.3" followed by its people
+            [...$("groups").querySelectorAll(".group")].forEach(g =>
+            {
+                const people = filled(g.querySelector(".comp-list"));
+                if (!people.length) return;
+                L.push("");
+                L.push("Habitación: " + g.querySelector(".g-room").value);
+                people.forEach(c => personLines(c, L));
+            });
+
             return L.join("\n");
         }
 
-        /* ---- Numeric-only inputs: strip anything that isn't a digit as you type.
-           Uses delegation on the form (class "num"), so it also covers the c-num
-           inputs of companions added later by addCompanion(). Runs BEFORE the
-           "Alive Preview" listener below (registration order), so the preview
-           always reads the already-cleaned value. ---- */
+        /* ---- Numeric-only inputs (delegated, so it covers the companions added later) ---- */
         $("form").addEventListener("input", e =>
         {
             if (e.target.matches(".num"))
@@ -328,6 +376,7 @@
         /* ---- Alive Preview ---- */
         function refresh() { $("prev").textContent = buildText(); }
         $("form").addEventListener("input", refresh);
+        $("form").addEventListener("change", refresh);
         $("form").addEventListener("click", () => setTimeout(refresh, 0));
         refresh();
 
@@ -340,7 +389,7 @@
                 return;
             }
             const text = encodeURIComponent(buildText());
-            window.open(`https://wa.me/${HOTEL_WHATSAPP}?text=${text}`, "_blank");
+            window.open(`https://wa.me/${CONFIG.whatsapp}?text=${text}`, "_blank");
         });
 
         /* ---- Copy text (backup) ---- */
@@ -348,19 +397,19 @@
         {
             const text = buildText();
             try { await navigator.clipboard.writeText(text); }
-            catch // works almost on every browser
+            catch
             {
                 const t = document.createElement("textarea");
-                t.value = text;               // Creates a text area 
-                document.body.appendChild(t); // Add it to the doc
-                t.select();                   // Select the content Ctrl + A 
-                document.execCommand("copy"); // Copy it Ctrl + C
-                t.remove();                   // Delete the text area
+                t.value = text;
+                document.body.appendChild(t);
+                t.select();
+                document.execCommand("copy");
+                t.remove();
             }
-            const ok = $("ok"); // The text = "Everything copied"
-            ok.style.display = "block"; // We show it and hide it after 2.2 sec
+            const ok = $("ok");
+            ok.style.display = "block";
             setTimeout(() => ok.style.display = "none", 2200);
         });
-        </script>
-    </body>
+    </script>
+</body>
 </html>
